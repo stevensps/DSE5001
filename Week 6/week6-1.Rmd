@@ -1,0 +1,609 @@
+---
+title: "Week 6"
+author: "Jeremiah Lowhorn"
+date: "2023-10-01"
+output: html_document
+---
+
+# Chapter 5 Foundations for Inference
+
+## Point Estimates and Error
+
+* We are often interested in population parameters.
+* Complete populations are difficult to collect data on, so we use sample statistics as point estimates for the unknown
+population parameters of interest.
+* Error in the estimate = difference between population parameter and sample statistic
+* Bias is systematic tendency to over- or under-estimate the true population parameter.
+* Sampling error describes how much an estimate will tend to vary from one sample to the next.
+* Much of statistics is focused on understanding and quantifying sampling error, and sample size is helpful for quantifying this error.
+
+Suppose that you don’t have access to the population of all American adults, which is a quite likely scenario. In order to estimate the proportion of American adults who support solar power expansion, you might sample from the population and use your sample proportion as the best guess for the unknown population proportion.
+
+* Sample, with replacement, 1000 American adults from the population, and record whether they support or not solar power expansion.
+* Find the sample proportion.
+* Plot the distribution of the sample proportions obtained by
+members of the class.
+
+```{r}
+library(ggplot2)
+
+# 1. Create a set of 250 million entries, where 88\% of
+# them are "support" and 12\% are "not".
+pop_size <- 250000000
+possible_entries <- c(rep("support", 0.88 * pop_size),
+rep("not", 0.12 * pop_size))
+# 2. Sample 1000 entries without replacement.
+out <- c()
+for(i in 1:1000){
+  sampled_entries <- sample(possible_entries, size = 1000)
+# 3. Compute p-hat: count the number that are "support",
+# then divide by # the sample size.
+  out <- c(out,sum(sampled_entries == "support") / 1000)
+}
+
+df <- data.frame(out)
+ggplot(df) +
+  geom_density(aes(x=out))
+
+```
+
+
+* In real-world applications, we never actually observe the sampling distribution, yet it is useful to always think of a point estimate as coming from such a hypothetical distribution.
+* Understanding the sampling distribution will help us characterize and make sense of the point estimates that we do observe.
+
+## Central limit theorem
+Sample proportions will be nearly normally distributed with mean equal to the population proportion, p, and standard error equal to $\sqrt{p(1-p)\over{n}}$
+
+* It wasn’t a coincidence that the sampling distribution we saw earlier was symmetric, and centered at the true population proportion.
+* Note that as n increases SE decreases.
+* As n increases samples will yield more consistent $\hat{p}$s, i.e. variability among $\hat{p}$s will be lower.
+
+Certain conditions must be met for the CLT to apply:
+
+1. Independence: Sampled observations must be independent. This is difficult to verify, but is more likely if
+
+* random sampling/assignment is used, and
+* if sampling without replacement, n < 10% of the population.
+
+2. Sample size: There should be at least 10 expected successes and 10 expected failures in the observed sample.
+This is difficult to verify if you don’t know the population proportion (or can’t assume a value for it). In those cases we look for the number of observed successes and failures to be at least 10.
+
+* The CLT states $SE=\sqrt{p(1-p)\over{n}}$, with the condition that $np$ and $n(1 - p)$ are at least 10, however we often don’t know the
+value of $p$, the population proportion
+* In these cases we substitute $\hat{p}$ for $p$
+
+
+Suppose we have a population where the true population proportion is p = 0.05, and we take random samples of size n = 50 from this  population. We calculate the sample proportion in each sample and plot these proportions. Would you expect this distribution to be nearly normal? Why, or why not?
+
+
+No, the success-failure condition is not met $(50 \times 0.05 = 2.5)$, hence we would not expect the sampling distribution to be nearly normal.
+
+
+## Confidence intervals for a proportion
+
+*  A plausible range of values for the population parameter is called a confidence interval.
+* Using only a sample statistic to estimate a parameter is like fishing in a murky lake with a spear, and using a confidence interval is like fishing with a net.
+* We can throw a spear where we saw a fish but we will probably miss. If we toss a net in that area, we have a good chance of catching the fish.
+* If we report a point estimate, we probably won’t hit the exact  population parameter. If we report a range of plausible values we have a good shot at capturing the parameter.
+
+
+Most commercial websites (e.g. social media platforms, news outlets, online retailers) collect a data about their users’ behaviors and use these data to deliver targeted content, recommendations, and ads. To understand whether Americans think their lives line up with how the algorithm-driven classification systems categorizes them, Pew Research asked a representative sample of 850 American Facebook users how accurately they feel the list of categories Facebook has listed for them on the page of their supposed interests actually represents them and their interests. 67% of the respondents said that the listed categories were accurate. Estimate the true proportion of American Facebook users who think the Facebook categorizes their interests accurately.
+
+$\hat{p} =0.67$, $n=850$
+
+The approximate 95% confidence interval is defined as $point\ estimate \pm 1.96 \times SE$
+
+$$SE=\sqrt{p(1-p)\over{n}} = \sqrt{0.67\times0.33\over{850}}\approx0.016$$
+
+$$\hat{p}\pm1.96\times SE = 0.67 \pm 1.96 \times 0.016=(0.64,0.70)$$
+
+64% to 70% of all American Facebook users think Facebook categorizes their interests accurately.
+
+## Changing the Confidence Interval
+$point\ estimate \pm z \times SE$
+
+* In a confidence interval, $z^{*} \times SE$ is called the margin of error, and for a given sample, the margin of error changes as the confidence level changes.
+* In order to change the confidence level we need to adjust $z^*$ in the above formula.
+* Commonly used confidence levels in practice are 90%, 95%, 98%, and 99%.
+* For a 95% confidence interval, $z^* = 1:96$.
+* However, using the standard normal $(z)$ distribution, it is possible to find the appropriate $z$ for any confidence level.
+
+```{r}
+# 95% confidence interval
+print(round(qnorm(1-.05/2),2))
+# 98% confidence interval
+print(round(qnorm(1-.02/2),2))
+```
+
+Confidence intervals are ...
+
+* always about the population
+* not probability statements
+* only about population parameters, not individual observations
+* only reliable if the sample statistic they’re based on is an unbiased estimator of the population parameter
+
+## Hypothesis Testing for a Proportion
+
+Gender discrimination experiment
+
+|Gender |Promoted|Not Promoted|Total|
+|-------|--------|------------|-----|
+|Male   |21      |3           |24   |
+|Female |14      |10          |24   |
+|Total  |35      |13          |48   |
+
+$\hat{p}_{males}=21/24\approx0.88\ and\ \hat{p}_{females} =14/24 \approx0.58$
+
+Possible explanations:
+
+* Promotion and gender are independent, no gender discrimination, observed difference in proportions is simply due to chance. --> null - (nothing is going on)
+* Promotion and gender are dependent, there is gender discrimination, observed difference in proportions is not due to chance. --> alternative - (something is going on)
+
+* Since it was quite unlikely to obtain results like the actual data or something more extreme in the simulations (male promotions being 30% or more higher than female promotions), we decided to reject the null hypothesis in favor of the alternative.
+
+### Framework 
+
+* We start with a null hypothesis ($H_0$) that represents the status quo.
+* We also have an alternative hypothesis ($H_A$) that represents our research question, i.e. what we’re testing for.
+* We conduct a hypothesis test under the assumption that the null hypothesis is true, either via simulation or traditional methods based on the central limit theorem (coming up next...).
+* If the test results suggest that the data do not provide convincing evidence for the alternative hypothesis, we stick with the null hypothesis. If they do, then we reject the null hypothesis in favor of the alternative.
+
+### Framework Test
+[Types of Hypothesis Tests](https://www.qualitygurus.com/common-types-of-hypothesis-tests/#:~:text=There%20are%20many%20different%20types%20of%20hypothesis%20tests%2C%20including%20tests,square%20and%20F%2Dtest)
+
+Earlier we calculated a 95% confidence interval for the proportion of American Facebook users who think Facebook categorizes their interests accurately as 64% to 67%. Based on this confidence interval, do the data support the hypothesis that majority of American Facebook users think Facebook categorizes their interests accurately.
+
+* The associated hypotheses are:
+  * $H_0: p = 0:50$: 50% of American Facebook users think Facebook categorizes their interests accurately
+  * $H_A: p > 0:50$: More than 50% of American Facebook users think Facebook categorizes their interests accurately
+* Null value is not included in the interval --> reject the null hypothesis.
+* This is a quick-and-dirty approach for hypothesis testing, but it doesn’t tell us the likelihood of certain outcomes under the null hypothesis (p-value).
+
+### Decision Errors
+
+* Hypothesis tests are not flawless.
+* In the court system innocent people are sometimes wrongly convicted and the guilty sometimes walk free.
+* Similarly, we can make a wrong decision in statistical hypothesis tests as well.
+* The difference is that we have the tools necessary to quantify how often we make errors in statistics.
+* There are two competing hypotheses: the null and the alternative.
+* In a hypothesis test, we make a decision about which might be true, but our choice might be incorrect.
+* A Type 1 Error is rejecting the null hypothesis when $H_0$ is true.
+* A Type 2 Error is failing to reject the null hypothesis when $H_A$ is true.
+* We (almost) never know if $H_0$ or $H_A$ is true, but we need to consider all possibilities.
+
+### Type 1 Error Rate
+
+* As a general rule we reject H0 when the p-value is less than 0.05, i.e. we use a significance level of 0.05, $\alpha = 0.05$.
+* This means that, for those cases where $H_0$ is actually true, we do not want to incorrectly reject it more than 5% of those times.
+* In other words, when using a 5% significance level there is about 5% chance of making a Type 1 error if the null hypothesis is true.
+
+$$P(Type\ 1\ error | H_0\ true) = \alpha$$
+
+* This is why we prefer small values
+
+
+### Example
+The same survey asked the 850 respondents how comfortable they are with Facebook creating a list of categories for them. 41% of the respondents said they are comfortable. Do these data provide convincing evidence that the proportion of American Facebook users are comfortable with Facebook creating a list of interest categories for them is different than 50%?
+
+* The parameter of interest is the proportion of all American Facebook users who are comfortable with Facebook creating categories of interests for them.
+* There may be two explanations why our sample proportion is lower than 0.50 (minority).
+* The true population proportion is different than 0.50.
+* The true population mean is 0.50, and the difference between the true population proportion and the sample proportion is simply due to natural sampling variability.
+
+* We start with the assumption that 50% of American Facebook users are comfortable with Facebook creating categories of interests for them
+
+$$H_0 : p = 0.50$$
+
+* We test the claim that the proportion of American Facebook users who are comfortable with Facebook creating categories of interests for them is different than 50%
+
+$$H_A : p \ne 0.50$$
+
+
+In order to evaluate if the observed sample proportion is unusual for the hypothesized sampling distribution, we determine how many standard errors away from the null it is, which is also called the test statistic.
+
+$$\hat{p}\ \thicksim N \Biggl(\mu=0.5,\ SE=\sqrt{0.5\times0.5\over{850}}\Biggl) $$
+$$Z={{\hat{p}-\mu}\over SE} = {0.41-0.5\over{0.0171}}=-5.26$$
+
+The sample proportion is 5.26 standard errors away from the hypothesized value. Is this considered unusually low? That is, is the result statistically significant?
+Yes, and we can quantify how unusual it is using a p-value.
+
+* We then use this test statistic to calculate the p-value, the probability of observing data at least as favorable to the alternative hypothesis as our current data set, if the null hypothesis were true.
+* If the p-value is low (lower than the significance level, $\alpha$, which is usually 5%) we say that it would be very unlikely to observe the data if the null hypothesis were true, and hence reject $H_0$.
+* If the p-value is high (higher than $\alpha$) we say that it is likely to observe the data even if the null hypothesis were true, and hence do not reject $H_0$.
+
+p-value: probability of observing data at least as favorable to $H_A$ as our current data set (a sample proportion lower than 0.41), if in fact $H_0$ were true (the true population proportion was 0.50).
+
+$$P(\hat{p} < 0.41\ or\ \hat{p} > 0:59\ |\ p = 0.50) = P(|Z| > 5.26) < 0.0001$$
+
+```{r}
+2*pnorm(-abs(-5.26))
+```
+
+* p-value < 0.0001
+* If 50% of all American FB users are comfortable with FB creating these interest categories, there is less than a 0.01% chance of observing a random sample of 850 American Facebook users where 41% or fewer or 59% of higher feel comfortable with it.
+* Pretty low probability to think that observed sample proportion, or something more extreme, is likely to happen by chance.
+* Since p-value is low (lower than 5%) we reject $H_0$.
+* The data provide convincing evidence that the proportion of American FB users who are comfortable with FB creating a list of interest categories for them is different than 50%.
+* The difference between the null value of 0.50 and observed sample proportion of 0.41 is not due to chance or sampling variability.
+
+
+# Chapter 8: Intro to Linear Regression
+In this unit we will learn to quantify the relationship between two numerical variables, as well as modeling numerical response variables using a numerical or categorical explanatory variable.
+
+## Motivating Example
+
+* Imagine we have three data points (latency, throughput) (40,3),(60,2),(80,1)
+* The goal is to find a linear equation that fits these points
+* Remember high school algebra slope intercept form
+  * $y = mx + b$
+  * $y = throughput,\ x = latency,\ b = constant\ (intercept),\ m=slope$
+* Which can be written as $throughput = \beta\ \times latency + C$
+* $\beta$ and the Constant are unknown parameters which can be solved in a system of linear equations.
+* $\beta 40 + C = 3$
+
+* $\beta 60 + C = 2$
+  
+* $\beta 80 + C = 1$
+
+```{r}
+X <- c(40,60,80)
+Y <- c(3,2,1)
+plot(X,Y)
+```
+## How do we solve for $\beta$ and C?
+Take the inverse of the first equation for elimination of the constant and we get:
+$$-40\beta-C=-3$$
+$$+60\beta+C=2\over{20\beta=-1}$$
+Solve for $\beta$ and we get:
+$$\beta=-{1\over{20}}$$
+We can now use $\beta$ to solve for the constant in the third equation:
+$${-80\over{20}} + C = 1$$
+Now C becomes:
+$$C = 1+{80\over{20}} = 5$$
+
+## Visualization of the Solution 
+
+```{r}
+X <- c(0,40,60,80)
+Y <- c(5,3,2,1)
+##lets see this visually
+plot(X,Y)
+abline(lm(Y~X))
+
+```
+
+
+```{r}
+###confirm our solution is accurate
+lm(Y~X)$coefficients
+
+```
+
+
+## Introducing the Idea of Regression
+
+* Regression is a method for estimating the coefficients when there is not an exact solution to the equations.
+* Regression seeks to minimize the distance between the observations and a theoretical line.
+* By minimizing the distances we can arrive at better estimates of our coefficients and provide better predictions!
+
+```{r}
+library(ggplot2)
+d <- mtcars
+fit <- lm(mpg ~ hp, data = d)
+
+d$predicted <- predict(fit)   # Save the predicted values
+d$residuals <- residuals(fit) # Save the residual values
+
+# Quick look at the actual, predicted, and residual values
+library(dplyr)
+d %>% select(mpg, predicted, residuals) 
+
+hist(d$residuals)
+
+```
+
+```{r}
+ggplot(d, aes(x = hp, y = mpg)) +
+  geom_smooth(method = "lm", se = FALSE, color = "lightgrey") +
+  geom_segment(aes(xend = hp, yend = predicted), alpha = .2) +
+  
+  # > Color adjustments made here...
+  geom_point(aes(color = residuals)) +  # Color mapped here
+  scale_color_gradient2(low = "blue", mid = "white", high = "red") +  # Colors to use here
+  guides(color = FALSE) +
+  # <
+  
+  geom_point(aes(y = predicted), shape = 1) +
+  theme_bw()
+```
+
+## Mathematics of Regression 
+
+* The next two points in this lecture we will go over the mathematics of regression and arrive at different solutions to the same problem.
+* The idea is to hopefully shed light on the intuition behind these models and provide you with the tools to expand even further on them.
+
+## Matrix Form 
+
+* With three points solving a linear system using substitution is easy, but what about 1000 points?
+* We can rewrite the equations in matrix form as: $Ax=b$ which becomes:
+
+$$\underbrace{\left[\begin{array}{cc} 
+1 & 40\\
+1 & 60\\
+1 & 80
+\end{array}\right]}_A
+\underbrace{\left[\begin{array}{cc} 
+C\\ 
+\beta
+\end{array}\right]}_X=\underbrace{\left[\begin{array}{cc} 
+3\\
+2\\
+1
+\end{array}\right]}_b$$
+
+
+* Why is this useful?
+  - We can use linear algebra to solve the system of equations with a computer!
+* We need to solve for $x$...
+  - Take the inverse of $A$ and $x$ becomes ${1\over{A}} \times b$
+```{r}  
+library(MASS)
+
+X <- c(40,60,80)
+Y <- c(3,2,1)
+
+A <- cbind(rep(1,length(X)),as.numeric(X))
+B <- as.matrix(Y)
+
+###we can use the ginv function from MASS to take the inverse 
+ginv(A)%*%B
+```
+
+
+## Introducing Least Squares Estimation (Mean Estimation aka L2 Norm)
+How do we estimate the coefficients when there is no solution to the linear system?
+
+* If there isn’t a solution, we attempt to seek the $x$  that gets closest to being a solution
+  - In least squares we minimize the sum of squared residuals where
+    - Residuals are the distance between the points on a fitted line vs the observed points
+  - Thus we minimize the distances between observed and theoretical points, hence $r=b−Ax$
+  - What is the length of $r$?
+  - We find the inner product which is $r\times r$ or $r^2$
+  - In matrix algebra it is particularly easy to find the length of a squared residual, $r^Tr$
+  - This ‘easiness’ is why least squares is used for virtually everything!
+* Since $r=b−Ax$, with replacement we get $(b−Ax)^T(b−Ax)$
+  - Here we need to solve for $x$, which we will not do here!
+* Once we solve for $x$ we get $x=(A^TA)^{−1}A^Tb$
+
+#### Assumptions
+
+1 Since residuals are squared, the assumption follows that residuals are normally distributed
+
+  - Otherwise you will have influential points who weight the slope of the line!
+  
+2 More rows than columns
+
+3 Linear relationship
+
+4 Homoscedasticity of residuals or equal variance
+
+  - No pattern in the residuals 
+  - No auto-correlation of residuals
+  
+5 Each observation is independent!!!
+
+6 No multivariate multicollinearity (not needed for this example)
+
+### Now Let’s Use Our New Equation!
+The R function solve is used to find the inverse…
+```{r}
+X <- c(40,60,80)
+Y <- c(3,2,1) 
+
+A <- cbind(rep(1,length(X)),as.numeric(X))
+B <- as.matrix(Y)
+
+###use solve, t() for transpose and %*% for matrix multiplication
+solve(t(A)%*%A) %*% t(A) %*% B
+```
+
+
+```{r}
+#as we expect, same solution
+lm(Y~X)$coefficients
+
+```
+
+## Larger Model
+```{r}
+df <- read.csv("matrixexample.csv", stringsAsFactors=FALSE)
+library(ggplot2)
+
+ggplot(df) +
+    geom_point(aes(x=Latency,y=Tput))+
+    geom_smooth(aes(x=Latency,y=Tput),method='lm',formula=y~x)
+
+```
+
+```{r}
+###lets look at the base R function to see what we should expect...
+lmmod <- lm(Tput~Latency,data=df)
+
+coeftable <- data.frame(Model='Base LM',Intercept = lmmod$coefficients[1],Slope = lmmod$coefficients[2])
+
+###define X & Y as their respective matrices
+A <- cbind(rep(1,nrow(df)),as.numeric(df$Latency))
+B <- as.matrix(df$Tput)
+
+###use forward solve to find the coefficients using our definition!
+coefs <- solve(t(A)%*%A, t(A)%*%B)  
+
+coeftable <- rbind(coeftable,
+                                     data.frame(Model='LA LM',Intercept = coefs[1],Slope = coefs[2]))
+
+coeftable  
+
+```
+
+## Estimating the Standard Errors, T Stats, & P-Values
+
+* How good are our coefficient estimates?
+* To measure the estimates we use something called standard errors, t stats and     p values.
+* The standard error is an estimate of the standard deviation of the coefficients.
+* The formula for estimating the standard errors is $\sigma^2(X^TX)^{−1}$
+* $\sigma^2$ can be solved to $\sum(b−A\times x)^2\over{DF}$
+  - This is equivalent to the sum of squares over the degrees of freedom!
+  - nrows - covariates = degrees of freedom
+  
+```{r}
+#degrees of freedom
+degrees.freedom <- nrow(A)-ncol(A)
+# estimate of sigma-squared, which is the same as the sum of squared residuals over degrees of freedom
+dSigmaSq <- sum((B - A%*%coefs)^2)/degrees.freedom
+# variance covariance matrix
+mVarCovar <- dSigmaSq*solve((t(A)%*%A)) 
+mVarCovar
+
+```
+
+* We are not done yet!
+* This simply gives us a variance-co-variance matrix, we still have to solve for $\sigma^2$ which is the diagonal of the matrix.
+* We also need to calculate the p value of the coefficients!
+* P values evaluate how well the coefficients are significant and are usable for inference!
+  - High p values mean that the coefficient is not significant.
+  
+```{r}
+# coeff. est. standard errors
+vStdErr <- sqrt(diag(mVarCovar))  
+stats <- data.frame(coefs,vStdErr)
+names(stats) <- c('Coeff','Std.Err.')
+# t stat coefficients over standard errors
+stats$TStat <- stats$Coeff/stats$Std.Err.
+# calculate the p values using the student t distribution, t stats and degrees of freedom
+stats$PVal <- 2*pt(-abs(stats$TStat),degrees.freedom)
+
+stats
+
+```
+
+## Residual Standard Error, R-Squared, and F Statistic
+### Residual Standard Error (Residual Standard Deviation)
+Residual standard error is goodness of fit measurement that measures the standard deviation of the residuals. First let us calculate the Residual Standard Error which is simply: $\sqrt{SSE\over DF}$  Where SSE is the sum of squares and DF is the degrees of freedom.
+
+```{r}
+
+pred <- stats[1,1] + stats[2,1]* df$Latency
+resid = pred-df$Tput
+SSE <- sum((pred-df$Tput)^2)
+RSE <- sqrt(SSE/degrees.freedom)
+RSE.line <- paste0('Residual standard error: ',RSE,' on ',degrees.freedom,' degrees of freedom')
+RSE
+
+```
+
+
+## Visualizing Residuals
+* One assumption of least squares regression is that the errors are normally distributed.
+  - This assumption exists because the errors are squared
+  - Outliers will cause the coefficient estimates to be weighted towards the outliers, thus the estimates are not robust when outliers exists.
+* As we can see our residuals are almost normally distributed.
+* There is a slight tail to the left which is attributable to an outlier.
+* We can either treat the outlier, or use another method for coefficient estimation.
+
+```{r}
+hist(resid)
+
+ggplot(data.frame(resid)) +
+  geom_density(aes(x=resid))
+
+plot(resid)
+
+```
+
+
+## Coefficient of Determination (R - Squared)
+
+* $R^2$ is defined as $1−{SSE\over{SS_Total}}$ where $SS_Total$ is the sum of squares proportionate to the variance of the data defined by: $SS_Total=\sum_i(y_i−\bar{y})^2$
+* $R_2$ gives a sense of the 'goodness of fit' of the model
+* In our case it explains how much of the variance is explained by the co-variate, Latency 
+* $R_2$ does NOT indicate - if the correct model was used - The most appropriate set of variables was used - The co-variates cause changes in the response - The model’s performance
+* In our example we can say that 99.5% of the variance in throughput is explained by latency
+
+```{r}
+
+R_2 <- 1-SSE/sum((df$Tput-mean(df$Tput))^2)
+R_2
+```
+
+## Adjusted R - Squared
+Adjusted $R^2$  takes into consideration the amount of data in the analysis and the number of co-variates, which both can lead to higher $R^2$ values.
+
+```{r}
+covariates <- nrow(stats)-1
+
+adj_r_2 <- 1 - (((1-R_2)*(nrow(df)-1))/(nrow(df)-covariates-1))
+
+R_2.line <- paste0('Multiple R-squared: ',R_2,', Adjusted R-squared: ',adj_r_2)
+adj_r_2
+```
+
+## F-Test
+
+* The F test is designed to indicate whether or not the model fits the data better than a model with no co-variates.
+* In our model the F statistic is significant which indicates the co-variate, latency does fit the data well.
+
+```{r}
+#sum of squares for model
+SSM <- sum((pred-mean(df$Tput))^2)
+
+#degrees of freedom of the model = number of parameters (response + covariates) -1
+DFM <- 2 - 1
+
+Fstat <- (SSM/DFM)/(SSE/degrees.freedom)
+
+#calculate the p value of the Fstat which uses the probability density function of the F distribution on 1 and 8 degrees of freedom
+F.pval <- 1-pf(Fstat,1,8)
+
+F.line <- paste0('F-statistic: ',Fstat,' on ',DFM,' and ',degrees.freedom,'DF, p-value: ',F.pval)
+
+Fstat
+```
+
+```{r}
+F.pval
+
+```
+
+## All of this in a single function
+```{r}
+mod <- lm(Tput ~ Latency, data=df)
+summary(mod)
+```
+
+```{r}
+model <- list(stats,RSE.line,R_2.line,F.line)
+
+model
+```
+
+# Quantile Regression (L1 Norm)
+* What if we didn’t square the residuals and just took the absolute value?
+* In fact this is what Gauss wanted to do in the 1800s but he couldn’t easily due to the lack of computer hardware and complexity of the analysis of variance!
+* 200 years later we are still using least squares because of the ‘easiness’ of the solution, even though we have the hardware!
+* Would Gauss be happy?
+* Benefits of LAD - Not sensitive to outliers (because they are not squared!)
+* Problems of LAD - Computationally difficult - No current solution to ANOVA - Lack of inference solutions
+* Looking at our Throughput Example With Quantreg and our Custom Function
+
+```{r}
+library(quantreg)
+
+quantreg.coefs <- rq(df$Tput~df$Latency)
+
+coeftable <- rbind(coeftable,
+                                     data.frame(Model='Quantile LM',Intercept = quantreg.coefs$coefficients[1],Slope = quantreg.coefs$coefficients[2]))
+
+quantreg.coefs$coefficients
+
+coeftable
+```

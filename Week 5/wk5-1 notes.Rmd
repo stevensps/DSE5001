@@ -1,0 +1,285 @@
+---
+title: "Week 5"
+output: html_document
+date: "2023-09-25"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(openintro)
+set.seed(1)
+```
+
+# Probability
+
+* A random process is a situation in which we know what outcomes could happen, but we don’t know which particular outcome will happen.
+* Examples: coin tosses, die rolls, iTunes shuffle, whether the stock market goes up or down tomorrow, etc.
+
+* Law of large numbers states that as more observations are collected, the proportion of occurrences with a particular outcome,$ˆpn$, converges to the probability of that outcome, $p$.
+
+```{r}
+fair_cion <- c('heads','tails')
+
+table(sample(fair_cion, size = 10, replace = TRUE))
+table(sample(fair_cion, size = 100, replace = TRUE))
+table(sample(fair_cion, size = 10000, replace = TRUE))
+
+```
+
+* $P(A) = Probability\ of\ event\ A$
+* $0 <= P(A) <= 1$
+
+## Frequentist interpretation:
+The probability of an outcome is the proportion of times the outcome would occur if we observed the random process an infinite number of times.
+
+## Bayesian interpretation:
+A Bayesian interprets probability as a subjective degree of belief: For the same event, two separate people could have different viewpoints and so assign different probabilities.Largely popularized by revolutionary advance in computational technology and methods during the last twenty years.
+
+
+## Disjoint (mutually exclusive) outcomes: Cannot happen at the same time.
+* The outcome of a single coin toss cannot be a head and a tail.
+* A student both cannot fail and pass a class.
+* A single card drawn from a deck cannot be an ace and a queen.
+
+## Non-disjoint outcomes: Can happen at the same time.
+* A student can get an A in Stats and A in Econ in the same semester.
+
+What is the probability of drawing a jack or a red card from a well shuffled deck? 
+
+$P(A\ or\ B) = P(A) + P(B) - P(A\ and\ B)$
+
+```{r}
+# p (jack) + p(red) - p(jack and red)
+4/52 + 26/52 - 2/52
+
+```
+## Independence
+Two processes are independent if knowing the outcome of one
+provides no useful information about the outcome of the other.
+
+* Knowing that the coin landed on a head on the first toss does not provide any useful information for determining what the coin will land on in the second toss. Outcomes of two tosses of a coin are independent.
+* Knowing that the first card drawn from a deck is an ace does provide useful information for determining the probability of drawing an ace in the second draw. Outcomes of two draws from a deck of cards (without replacement) are dependent.
+
+### Checking for independence
+Between January 9-12, 2013, SurveyUSA interviewed a random sample of 500 NC residents asking them whether they think widespread gun ownership protects law abiding citizens from crime, or makes society more dangerous. 58% of all respondents said it protects citizens. 67% of  White respondents, 28% of Black respondents, and 64% of Hispanic respondents shared this view. Which of the below is true?
+
+
+If P(A occurs, given that B is true) = P(A | B) = P(A), then A and B are independent.
+
+P(protects citizens) = 0.58
+
+P(randomly selected NC resident says gun ownership protects citizens, given that the resident is white) =
+
+P(protects citizens | White) = 0.67
+
+P(protects citizens | Black) = 0.28
+
+P(protects citizens | Hispanic) = 0.64
+
+P(protects citizens) varies by race/ethnicity, therefore opinion on gun ownership and race ethnicity are most likely dependent.
+
+* If conditional probabilities calculated based on sample data suggest dependence between two variables, the next step is to conduct a hypothesis test to determine if the observed difference between the probabilities is likely or unlikely to have happened by chance.
+* If the observed difference between the conditional probabilities is large, then there is stronger evidence that the difference is real.
+* If a sample is large, then even a small difference can provide strong evidence of a real difference.
+
+### Product Rule for Independent Events
+$P(A\ and\ B) = P(A) * P(B)$
+
+What is the probability of getting two tails in a row?
+```{r}
+1/2 * 1/2
+```
+
+A recent Gallup poll suggests that 25.5% of Texans do not have health insurance as of June 2012. Assuming that the uninsured rate stayed constant, what is the probability that two randomly selected Texans are both uninsured?
+
+```{r}
+0.255 * 0.255
+```
+
+## Conditional Probability
+The conditional probability of the outcome of interest A given condition B is calculated as
+$P(A|B) = {{P( A\ and\ B)}\over{P(B)}}$
+
+Researchers randomly assigned 72 chronic users of cocaine into three groups: desipramine (antidepressant), lithium (standard treatment for cocaine) and placebo. Results of the study are summarized below.
+
+|drug        |  relapse    | no relapse  | total|
+|------------|-------------|-------------|------|
+|desipramine |10           |14           |24    |
+|lithium     |18           |6            |24    |
+|placebo     |20           |4            |24    |
+|total       |48           |24           |72    |
+
+What is the probability that a patient relapsed? 
+```{r}
+48/72
+```
+
+What is the probability that a patient received the antidepressant (desipramine) and relapsed?
+```{r}
+10/72
+```
+
+If we know that a patient received the antidepressant (desipramine), what is the probability that they relapsed?
+```{r}
+10/24
+
+```
+
+## General Multiplication Rule
+Earlier we saw that if two events are independent, their joint probability is simply the product of their probabilities. If the events are not believed to be independent, the joint probability is calculated slightly differently.
+
+* If A and B represent two outcomes or events, then $P(A\ and\ B) = P(A|B) * P(B)$ Note that this formula is simply the conditional probability formula, rearranged.
+*  It is useful to think of A as the outcome of interest and B as the condition.
+
+## Inverting Probabilities
+When a patient goes through breast cancer screening there are two competing claims: patient had cancer and patient doesn’t have cancer. If a mammogram yields a positive result, what is the probability that patient actually has cancer?
+
+
+
+![](invertingprobs.PNG)
+
+Using conditional probability $P(A|B) = {{P( A\ and\ B)}\over{P(B)}}$
+```{r}
+round(0.0133/(0.0133+0.0983),3)
+```
+
+
+## Sampling from a Small Population
+### Sampling With Replacement
+When sampling with replacement, you put back what you just drew.
+
+* Imagine you have a bag with 5 red, 3 blue and 2 orange chips in it. What is the probability that the first chip you draw is blue?
+
+$Prob(1^{st}\ chip\ B)\ =\ {3\over{5+3+2}}\ =\ {3\over{10}}\ =\ 0.3$
+
+* Suppose you did indeed pull a blue chip in the first draw. If drawing with replacement, what is the probability of drawing a blue chip in the second draw?
+Its the same, because you put the blue chip back. 
+
+$Prob(2^{nd}\ chip\ B|1^{st}\ chip\ B)\ =\ {3\over{10}}\ =\ 0.3$
+
+* If drawing with replacement, what is the probability of drawing two blue chips in a row?
+
+
+$Prob(1^{st}\ chip\ B) * Prob(2^{nd}\ chip\ B|1^{st}\ chip\ B)\ =\ 0.3*0.3 = 0.09$
+
+* When drawing with replacement, probability of the second
+chip being blue does not depend on the color of the first chip
+since whatever we draw in the first draw gets put back in the
+bag.
+
+$Prob(B|B) = Prob(B|O)$
+
+* In addition, this probability is equal to the probability of
+drawing a blue chip in the first draw, since the composition of
+the bag never changes when sampling with replacement.
+
+$Prob(B|B) = Prob(B)$
+
+* When drawing with replacement, draws are independent.
+
+### Sampling Without Replacement
+When drawing without replacement you do not put back what you just drew.
+
+* Suppose you pulled a blue chip in the first draw. If drawing without replacement, what is the probability of drawing a blue chip in the second draw?
+There would only be two blue chips left if the first was not replaced. 
+
+$Prob(2^{nd}\ chip\ B|1^{st}\ chip\ B)={2\over{9}}=0.22$
+
+* If drawing without replacement, what is the probability of drawing two blue chips in a row?
+
+$Prob(1^{st}\ chip\ B) * Prob(2^{nd}\ chip\ B|1^{st}\ chip\ B) = 0.3*0.22=0.066$
+
+* When drawing without replacement, the probability of the second chip being blue given the first was blue is not equal to the probability of drawing a blue chip in the first draw since the composition of the bag changes with the outcome of the first draw.
+
+$Prob(B|B) \neq Prob(B)$
+
+* When drawing without replacement, draws are not independent.
+* This is especially important to take note of when the sample sizes are small. If we were dealing with, say, 10,000 chips in a (giant) bag, taking out one chip of any color would not have as big an impact on the probabilities in the second draw.
+
+
+## Random Variables
+A random variable is a numeric quantity whose value depends
+on the outcome of a random event
+
+* We use a capital letter, like X, to denote a random variable
+* The values of a random variable are denoted with a lowercase letter, in this case x
+* For example, $P(X = x)$
+* There are two types of random variables:
+* Discrete random variables often take only integer values
+* Example: Number of credit hours, Difference in number of credit hours this term vs last
+* Continuous random variables take real (decimal) values
+* Example: Cost of books this term, Difference in cost of books this term vs last
+* We are often interested in the average outcome of a random variable.
+* We call this the expected value (mean), and it is a weighted average of the possible outcomes
+$\mu = E(X)=\sum\limits_{i=1}^{k} x_iP(X=x_i)$
+
+In a game of cards you win \$1 if you draw a heart, \$5 if you draw an ace (including the ace of hearts), \$10 if you draw the king of spades and nothing for any other card you draw. Write the probability model for your winnings, and calculate your expected winning.
+
+
+|Event         |X |$P(X)$       |$XP(X)$                        |
+|--------------|--|-------------|-------------------------------|
+|Heart(not ace)|1 |$12\over{52}$|       $12\over{52}$           |
+|Ace           |5 |$4\over{52}$ |       $20\over{52}$           |
+|King of Spades|10|$1\over{52}$ |       $10\over{52}$           |
+|All Else      |0 |$35\over{52}$|       0                       |
+|--------------|--|-------------|-------------------------------|
+|Total         |  |             |$E(X)={42\over{52}}\approx0.81$|
+
+
+We are also often interested in the variability in the values of a
+random variable
+
+$\sigma^2=Var(X)=\sum\limits_{i=1}^k(x_i-E(X))^2P(X=x_i)$
+$\sigma = SD(X)= \sqrt{Var(X)}$
+
+For the previous card game example, how much would you expect the winnings to vary from game to game?
+
+|$X$|$P(X)$       |$XP(X)$                        |$X-E(X))^2$          |$P(X)(X-E(X))^2$               |
+|---|-------------|-------------------------------|---------------------|-------------------------------|
+|1  |$12\over{52}$|$1*{12\over{52}}$              |$(1-0.81)^2=0.0361$  |${12\over{52}}*0.0361=0.0083$  |
+|5  |$4\over{52}$ |$5*{4\over{52}}={20\over{52}}$ |$(5-0.81)^2=17.5561$ |${4\over{52}}*17.5561=1.3505$  |
+|10 |$1\over{52}$ |$10*{1\over{52}}={10\over{52}}$|$(10-0.81)^2=84.4561$|${1\over{52}}*84.4561=1.6242$  |
+|0  |$35\over{52}$|$0*{1\over{52}}=0$             |$(0-0.81)^2=.6561$   |${35\over{52}}*0.6561=0.4416$  |   
+|   |             |$E(X)=0.81$                    |                     |$V(X) = 3.4246$                |
+|   |             |                               |                     |$SD(X)=\sqrt{3.4246}=1.85$     |
+
+The winnings vary \$1.85 from game to game. 
+
+
+```{r}
+x <- c(1,5,10,0)
+p_x <- c(12/52,4/52,1/52,35/52)
+
+x_px <- sum(x * p_x)
+
+x_ex <- (x-x_px)^2
+
+sqrt(sum(p_x * x_ex))
+
+```
+
+## Linear Combinations
+A linear combination of random variables X and Y is given by: $aX + bY$
+where $a$ and $b$ are some fixed numbers. 
+
+* The average value of a linear combination of random variables is given by: $E(aX+bY)=a\times E(X)+ b \times E(Y)$
+
+On average you take 10 minutes for each statistics homework problem and 15 minutes for each chemistry homework problem. This week you have 5 statistics and 4 chemistry homework problems assigned. What is the total time you expect to spend on statistics and chemistry homework for the week?
+
+$E(S+S+S+S+S+C+C+C+C)=5\times E(S) + 4 \times E(C)$
+$=5 \times 10 + 4 \times 15$
+$=50+60$
+$=110 min$
+
+* The variability of a linear combination of two independent random variables is calculated as
+$V(aX+bY) = a^2 \times V(X) + b^2 \times V(Y)$
+
+* The standard deviation of the linear combination is the square root of the variance. 
+
+
+The standard deviation of the time you take for each statistics homework problem is 1.5 minutes, and it is 2 minutes for each chemistry problem. What is the standard deviation of the time you expect to spend on statistics and physics homework for the week if you have 5 statistics and 4 chemistry homework problems assigned? Suppose that the time it takes to complete each problem is independent of another.
+
+$5 \times V(S) + 4 \times V(C)$
+$5 \times 1.5^2 + 4 \times 2^2$
+$\sigma =27.25$

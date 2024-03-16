@@ -1,0 +1,14 @@
+Error received when installing packages is .rmd file
+
+  |...............                                     |  29% [unnamed-chunk-1]
+
+processing file: TEST-v3.Rmd
+
+Quitting from lines 9-109 [unnamed-chunk-1] (TEST-v3.Rmd)
+                                                                                                            
+Error in `contrib.url()`:
+! trying to use CRAN without setting a mirror
+Backtrace:
+ 1. utils::install.packages("dplyr")
+ 2. utils::contrib.url(repos, "source")
+Execution halted

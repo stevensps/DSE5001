@@ -1,0 +1,145 @@
+---
+title: "Study Guide"
+author: "Jeremiah Lowhorn"
+date: "2023-10-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Week 8 - Study Guide
+
+## Question 1 - BAYES’ THEOREM: INVERTING PROBABILITIES
+
+GUIDED PRACTICE 3.43
+
+Jose visits campus every Thursday evening. However, some days the parking garage is full, often due to college events. There are academic events on 35% of evenings, sporting events on 20% of evenings, and no events on 45% of evenings. When there is an academic event, the garage fills up about 25% of the time, and it fills up 70% of evenings with sporting events. On evenings when there are no events, it only fills up about 5% of the time. If Jose comes to campus and finds the garage full, what is the probability that there is a sporting event? 
+
+The outcome of interest is whether there is a sporting event (call this $A1$), and the condition is that the lot is full $(B)$. Let $A2$ represent an academic event and $A3$ represent there being no event on campus. Then the given probabilities can be written as
+
+$P(A_1) = 0.2,$
+$P(A_2) = 0.35,$
+$P(A_3) = 0.45,$
+$P(B|A_1) = 0.7,$
+$P(B|A_2) = 0.25,$
+$P(B|A_3) = 0.05$
+
+Bayes' Theorem can be used to compute the probability of a sporting event $(A1)$ under the condition that the parking lot is full $(B)$:
+
+$P(A_1|B)={P(B|A_1)\times P(A_1)\over{P(B|A_1)\times P(A_1)+P(B|A_2)\times P(A_2) + P(B|A_3) \times P(A_3)}}$
+
+```{r}
+
+(0.7*0.2)/(0.7*0.2+0.25*.35+.05*.45)
+
+```
+
+Based on the information that the garage is full, there is a 56% probability that a sporting event is being held on campus that evening.
+
+## Question 2 - Central Limit Theorem & Sampling Proportions
+
+
+## Question 3 - Distributions and Calculating Tails using Z-Scores
+https://sphweb.bumc.bu.edu/otlt/mph-modules/bs/bs704_probability/bs704_probability10.html
+
+GUIDED PRACTICE 4.15
+The SAT scores follow N(1100; 200)
+
+(a) What is the 95th percentile for SAT scores?
+
+(b) What is the 97.5th percentile for SAT scores?
+
+$Z = {{x-\mu}\over{\sigma}}$
+$Z = {{x-1100}\over{200}}$
+
+```{r}
+
+qnorm(.95,mean=1100,sd = 200)
+qnorm(.975,mean=1100,sd = 200)
+```
+
+## Question 4 - Describing Linear Regression Models
+
+## Question 5 - Interpreting Regression Models
+### Calculate the Slope from T-score & Standard errors
+
+
+## Question 6 - Intro to Data
+1.41 Eat better, feel better? In a public health study on the effects of consumption of fruits and vegetables on psychological well-being in young adults, participants were randomly assigned to three groups: (1) diet-as-usual, (2) an ecological momentary intervention involving text message reminders to increase their fruits and vegetable consumption plus a voucher to purchase them, or (3) a fruit and vegetable intervention in which participants were given two additional daily servings of fresh fruits and vegetables to consume on top of their normal diet. Participants were asked to take a nightly survey on their smartphones. Participants were student volunteers at the University of Otago, New Zealand. At the end of the 14-day study, only participants in the third group showed improvements to their psychological well-being across the 14-days relative to the other groups.
+
+(a) What type of study is this?
+
+(b) Identify the explanatory and response variables.
+
+(c) Comment on whether the results of the study can be generalized to the population.
+
+(d) Comment on whether the results of the study can be used to establish causal relationships.
+
+(e) A newspaper article reporting on the study states, "The results of this study provide proof that giving young adults fresh fruits and vegetables to eat can have psychological benefits, even over a brief period of time." How would you suggest revising this statement so that it can be supported by the study?
+
+
+Answer:
+
+(a) Randomized controlled experiment.
+
+(b) Explanatory: treatment group (categorical, with 3 levels). Response variable: Psychological well-being.
+
+(c) No, because the participants were volunteers. 
+
+(d) Yes, because it was an experiment.
+
+(e) The statement should say evidence" instead of proof".
+
+
+## Question 7 - Interpretting Distributions
+
+## Question 8 - Distributions, Z-scores, & Calculating Tails
+
+## Question 9 - Probability
+
+## Question 10 - Hypothesis Testing for a Proportion
+
+The same survey asked the 850 respondents how comfortable they are with Facebook creating a list of categories for them. 41% of the respondents said they are comfortable. Do these data provide convincing evidence that the proportion of American Facebook users are comfortable with Facebook creating a list of interest categories for them is different than 50%?
+
+* The parameter of interest is the proportion of all American Facebook users who are comfortable with Facebook creating categories of interests for them.
+* There may be two explanations why our sample proportion is lower than 0.50 (minority).
+* The true population proportion is different than 0.50.
+* The true population mean is 0.50, and the difference between the true population proportion and the sample proportion is simply due to natural sampling variability.
+
+* We start with the assumption that 50% of American Facebook users are comfortable with Facebook creating categories of interests for them
+
+$$H_0 : p = 0.50$$
+
+* We test the claim that the proportion of American Facebook users who are comfortable with Facebook creating categories of interests for them is different than 50%
+
+$$H_A : p \ne 0.50$$
+
+
+In order to evaluate if the observed sample proportion is unusual for the hypothesized sampling distribution, we determine how many standard errors away from the null it is, which is also called the test statistic.
+
+$$\hat{p}\ \thicksim N \Biggl(\mu=0.5,\ SE=\sqrt{0.5\times0.5\over{850}}\Biggl) $$
+$$Z={{\hat{p}-\mu}\over SE} = {0.41-0.5\over{0.0171}}=-5.26$$
+
+The sample proportion is 5.26 standard errors away from the hypothesized value. Is this considered unusually low? That is, is the result statistically significant?
+Yes, and we can quantify how unusual it is using a p-value.
+
+* We then use this test statistic to calculate the p-value, the probability of observing data at least as favorable to the alternative hypothesis as our current data set, if the null hypothesis were true.
+* If the p-value is low (lower than the significance level, $\alpha$, which is usually 5%) we say that it would be very unlikely to observe the data if the null hypothesis were true, and hence reject $H_0$.
+* If the p-value is high (higher than $\alpha$) we say that it is likely to observe the data even if the null hypothesis were true, and hence do not reject $H_0$.
+
+p-value: probability of observing data at least as favorable to $H_A$ as our current data set (a sample proportion lower than 0.41), if in fact $H_0$ were true (the true population proportion was 0.50).
+
+$$P(\hat{p} < 0.41\ or\ \hat{p} > 0:59\ |\ p = 0.50) = P(|Z| > 5.26) < 0.0001$$
+
+```{r}
+2*pnorm(-abs(-5.26))
+```
+
+* p-value < 0.0001
+* If 50% of all American FB users are comfortable with FB creating these interest categories, there is less than a 0.01% chance of observing a random sample of 850 American Facebook users where 41% or fewer or 59% of higher feel comfortable with it.
+* Pretty low probability to think that observed sample proportion, or something more extreme, is likely to happen by chance.
+* Since p-value is low (lower than 5%) we reject $H_0$.
+* The data provide convincing evidence that the proportion of American FB users who are comfortable with FB creating a list of interest categories for them is different than 50%.
+* The difference between the null value of 0.50 and observed sample proportion of 0.41 is not due to chance or sampling variability.

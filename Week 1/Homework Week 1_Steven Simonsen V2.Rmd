@@ -1,0 +1,128 @@
+---
+title: "Homework Week 1"
+author: "Steven Simonsen"
+date: "2024-01-18"
+output: pdf_document
+---
+
+## Chapter 1 HW: Consider Figure 1.1 (page 2) with respect to some particular scientific research study, such as a research project that the reader might be undertaking. What is involved in the data analysis of the study at all its stages, from processing raw data to eventual communication of results? How much time is likely to be needed at each stage? What specifically needs to be done at each stage? Will R be sufficient for all the stages of analysis of the study? What other tools are required?
+
+Considering Figure 1.1 with respect to a particular scientific research study, the gathering of raw data is the first stage of the study. In terms of involvement, the gathering of raw data can vary. For example, if the dataset is already readily available from an established source (ex: World Health Organization regarding life expectancy), then gathering the data from the source is straightforward. However, if the person conducting the research study must gather their own data, then parameters for the study must be established and executed. The amount of time spent collecting data outside of an existing data set can vary widely, depending on the type of study performed and the number of data points collected.  By contrast, pulling raw data from an already existing raw data source is much faster. At this stage, the data may or may not be formatted in R and may also be structured or unstructured. The data may be present in the form of text, JSON, or SQL, just to name a few.  The upcoming lifecycle stages will utilize the use of R much more heavily to produce a final result.
+
+The next stage in the research study is data wrangling, and this stage can be very time consuming and laborious. The amount of time needed at this stage will vary depending on the complexity of the data and the amount of data manipulation needed to progress to tidy data.  For this stage of the research study, R is not only sufficient, but preferred given the various packages R offers such as readr, dplyr, and tidyr (Andrews, 2021). At this stage, the use of numerous operations, commands, variables, data frames, and vectors may be needed to achieve the desired tidy data result. Ideally, tidy data is achieved in the form of a structured, tabular data set with rows and columns. Additional tools may include the need for R packages, existing functions, and custom functions created withing the author’s code. 
+
+After tidy data has been achieved through data wrangling, the next step in the process is data visualization and exploration. As illustrated in Figure 1.1, this is an iterative process. Data visualization is defined and improved upon as further exploration of the data is conducted. The time it takes to explore and visualize the data depends upon the complexity of the tidy data. To elaborate, a study containing minimal data points, or a relatively small sample size will generally be less complex. However, a more simplistic data set may lead to false conclusions. As an example, a coin flip conducted ten times may indicate that a “heads” result occurs about 70% of the time. However, as additional coin flips are conducted, the law of large numbers is recognized, and “heads” will result much closer to 50% of the time. The exploration of the data at this stage will involve many of the same tools as the data wrangling stage. Additional tools may include the use of reading the data through the read_csv R command and viewing the data with functions such as summary, str, head, and tail. The visualization process in R can include various packages such as ggplot2 to display the data in the form of boxplots, scatterplots, and more. R should be solely sufficient in accomplishing this stage of the study.
+
+After data visualization has been completed, data models are created to represent the data. Then, fitted models are created through inferences made within the data. As with data visualization and exploration, this process is iterative. The determination of the best fitted model to use for the data is conducted from inferences within the visualization created. Next, evaluations are made to determine if changes are required to the overall model, thus depicting a more accurate fitted model. The time spent within this stage of the study depends on the code used to fit the data to the model. As noted above, repetition is required as part of this process but can also result in overfitting the data to the model. Conversely, under-fitting is also a concern. Therefore, the model must accurately convey a well-defined relationship between the variables defined and the target results, resulting in a flexible probabilistic model (H2O.ai., n.d.). Again, R is a great choice for modelling the data due to the robust packages R has to offer. 
+
+Finally, communication is the final step in the research study and is vitally important. To demonstrate sound findings from previous steps in the research study, sound communication of the analysis must be conducted. A great way to communicate results is with R Markdown. R Markdown is available in RStudio and intertwines R code, plain text describing the analysis, and produces reports containing the visualizations from the study. The basic tools required for R Markdown include the use of knitr to translate the R to the desired output format (ex: PDF, HTML, etc.). The time spent within the communication phase depends on the complexity and volume of the findings. For example, if numerous dynamic documents such as plots, tables, and results are used in conjunction with narrative text, it could take significant time to create the communication document. Although knitr is used within the context of the final communication file(s), R is the underlying tool containing all analysis and code used to communicate the final results.
+
+## Sources
+Andrews, M. (2021). Chapter 1: Data Analysis and Data Science. In Doing data science in R: An introduction for social scientists. essay, SAGE Publications Ltd. 
+
+What is model fitting and why is it important?. What is model fitting and why is it important? | H2O.ai. (n.d.). https://h2o.ai/wiki/model-fitting/
+
+## Chapter 2 HW: Install R and RStudio and then go through the steps in the guide, explicitly typing in all the code, using data or examples of their own choice. Copying and pasting any code is not recommended. Type all of your code in an RMarkdown and submit a knitted PDF. We will go over this in class. 
+```{r}
+#Calculator commands
+2+2 #addition
+3-5 #subtraction
+3*2 #multiplication
+4/3 #division
+(2+2) ^ (3/3.5)
+
+#Equality/inequality operations
+12==(6*2) #test for equality
+(3*4) != (18-7) #test for inequality
+3 < 10 #less than
+(2*5) <= 10 #less than or equal
+
+#Logical values and logical operations
+TRUE & FALSE #logical and
+TRUE | FALSE #logical or
+!TRUE #logical not
+(TRUE | !TRUE) & !FALSE
+
+#Variables and assignment
+(12/3.5)^2 + (1/2.5)^3 + (1+2+3)^0.33
+x <- (12/3.5)^2 + (1/2.5)^3 + (1+2+3)^0.33
+x
+x^2
+x * 3.6
+
+#Vectors
+primes <- c(2, 3, 5, 7, 11, 13)
+primes + 1
+primes / 2
+primes == 3
+primes >= 7
+
+#Indexing Vectors
+primes[1]
+primes[5]
+primes[c(3, 5, 2)]
+primes[-1]
+primes[-2]
+
+#Vector types
+nation <- c('ireland', 'england', 'scotland', 'wales')
+nation[1]
+nation[2:3]
+nation == 'ireland'
+
+class(primes)
+class(nation)
+class(nation == 'ireland')
+
+#Data Frames
+Df <- data.frame(name = c('billy', 'joe', 'bob'), 
+                 age = c(21, 29, 23))
+Df
+
+#Indexing data frames
+Df[3,2] #row 3, col 2
+Df[c(1, 3), 2] #rows 1 and 3, col 2
+Df[1,] #row 1, all cols
+Df[, 2] #all rows, col 2
+Df$age
+Df[['age']]
+Df['age']
+
+#Functions
+length(primes)
+sum(primes)
+mean(primes)
+median(primes)
+sd(primes)
+var(primes)
+
+#Custom functions
+my_mean <- function(x){sum(x)/length(x)}
+my_mean(primes)
+
+#Writing R scripts and code comments
+#Here is a data frame with four variables
+#The variables are name, age, sex, and occupation
+composites <- c(4, 6, 8, 9, 10, 12)
+composites_plus_one <- composites + 1
+composites_minus_one <- composites - 1
+Df2 <- data.frame(name = c('jane', 'joe', 'billy'),
+                  age = c(23, 27, 24),
+                  sex = c('female', 'male', 'male'),
+                  occupation = c('tinker', 'tailor', 'spy')
+                  )
+
+#Packages
+install.packages("dplyr", repos = "http://cran.us.r-project.org")
+install.packages(c("dplyr", "tidyr", "ggplot2"), repos = "http://cran.us.r-project.org")
+install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+library("tidyverse")
+
+#Reading in data
+library(readr)
+getwd()
+test_data <- read_csv("weight.csv")
+test_data
+glimpse(test_data)
+```
+

@@ -1,0 +1,210 @@
+---
+title: "Week 7"
+author: "Jeremiah Lowhorn"
+date: "2023-10-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+set.seed(101)  
+library(Metrics)
+library(corrplot)
+```
+
+# Linear Models Continued
+
+Remember our assumptions:
+
+1 Since residuals are squared, the assumption follows that residuals are normally distributed
+
+  - Otherwise you will have influential points who weight the slope of the line!
+  
+2 More rows than columns
+
+3 Linear relationship
+
+4 Homoscedasticity of residuals or equal variance
+
+  - No pattern in the residuals
+  
+5 No auto-correlation of residuals
+
+6 No multivariate multicollinearity (not needed for this example)
+
+
+
+## Train Test Split
+
+```{r}
+
+
+```
+
+
+```{r}
+data <- mtcars
+data <- data[row.names(data) != "Toyota Corolla", , drop = FALSE]
+sample <- sample.int(n = nrow(data), size = floor(.8*nrow(data)), replace = F)
+train <- data[sample, ]
+test  <- data[-sample, ]
+
+```
+
+### Testing for Autocorrelation
+
+[Autocorrelation Link](https://towardsdatascience.com/understanding-autocorrelation-ddce4f0a9fda)
+
+
+```{r}
+acf(data$mpg)
+```
+
+### Testing for Multicollinearity
+
+```{r}
+corrplot(cor(data),method='number')
+
+```
+
+
+
+### The Everything Model
+
+```{r}
+mod <- lm(mpg~., train)
+summary(mod)
+```
+
+
+### Variance Inflation Factor
+
+![](vif.png)
+
+
+```{r}
+#load the car library
+library(car)
+
+#calculate the VIF for each predictor variable in the model
+vif(mod)
+
+```
+
+
+
+
+### Base Model Plots (Residual Analysis)
+
+[QQ Plots Explained](https://library.virginia.edu/data/articles/understanding-q-q-plots#:~:text=The%20QQ%20plot%2C%20or%20quantile,as%20a%20normal%20or%20exponential.)
+
+#### QQ Plot
+The QQ plot, or quantile-quantile plot, is a graphical tool to help us assess if a set of data plausibly came from some theoretical distribution such as a normal or exponential. For example, if we run a statistical analysis that assumes our residuals are normally distributed, we can use a normal QQ plot to check that assumption. It's just a visual check, not an air-tight proof, so it is somewhat subjective. But it allows us to see at-a-glance if our assumption is plausible, and if not, how the assumption is violated and what data points contribute to the violation.
+
+#### Scale Location Plot
+The Scale-Location plot helps evaluate the assumption of homoscedasticity, or equal variance of residuals. This plot displays the spread (or scatter) of the square-rooted standardized residuals against the fitted values.
+
+
+#### Residuals vs Leverage Plot
+A residuals vs. leverage plot is a type of diagnostic plot that allows us to identify influential observations in a regression model.
+
+
+```{r}
+plot(mod)
+```
+
+#### Training Error
+```{r}
+train_preds <- predict(mod,train)
+train_resid <- train$mpg - train_preds
+
+mse <- mse(train$mpg , train_preds)
+mae <- mae(train$mpg, train_preds)
+mape <- mape(train$mpg, train_preds)
+
+print(paste("Mean Squared Error is: ", round(mse,4)))
+print(paste("Mean Absolute Error is: ", round(mae,4)))
+print(paste0("Mean Absolute Percentage Error is: ", round(mape*100,2), '%'))
+
+```
+
+#### Autocorrelation in Residuals
+
+```{r}
+acf(train_resid)
+```
+
+#### Test Error
+```{r}
+test_preds <- predict(mod,test)
+resid <- test$mpg - test_preds
+
+mse <- mse(test$mpg , test_preds)
+mae <- mae(test$mpg, test_preds)
+mape <- mape(test$mpg, test_preds)
+
+print(paste("Mean Squared Error is: ", round(mse,4)))
+print(paste("Mean Absolute Error is: ", round(mae,4)))
+print(paste0("Mean Absolute Percentage Error is: ", round(mape*100,2), '%'))
+
+```
+
+
+### Ideal Model
+
+```{r}
+mod2 <- lm(mpg ~ wt + qsec, train)
+summary(mod2)
+```
+
+
+#### Base Model Plots (Residual Analysis)
+
+```{r}
+plot(mod2)
+```
+
+#### Training Error
+```{r}
+train_preds <- predict(mod2,train)
+train_resid <- train$mpg - train_preds
+
+mse <- mse(train$mpg , train_preds)
+mae <- mae(train$mpg, train_preds)
+mape <- mape(train$mpg, train_preds)
+
+print(paste("Mean Squared Error is: ", round(mse,4)))
+print(paste("Mean Absolute Error is: ", round(mae,4)))
+print(paste0("Mean Absolute Percentage Error is: ", round(mape*100,2), '%'))
+
+```
+
+#### Autocorrelation in Residuals
+
+```{r}
+acf(train_resid)
+```
+
+
+#### Test Error
+```{r}
+test_preds <- predict(mod2,test)
+resid <- test$mpg - test_preds
+
+mse <- mse(test$mpg , test_preds)
+mae <- mae(test$mpg, test_preds)
+mape <- mape(test$mpg, test_preds)
+
+print(paste("Mean Squared Error is: ", round(mse,4)))
+print(paste("Mean Absolute Error is: ", round(mae,4)))
+print(paste0("Mean Absolute Percentage Error is: ", round(mape*100,2), '%'))
+
+```
+
+
+### Anova of All Mods
+
+```{r}
+anova(mod2, mod,test="Chisq")
+
+```
